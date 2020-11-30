@@ -23,11 +23,9 @@ import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.commons.codec.binary.Hex;
-import org.apache.kafka.common.utils.Bytes;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -80,7 +78,7 @@ public class AvroRecordTest {
 
     @Test
     public void testGetSchema() {
-        Map<String, Class> schema = record.getSchema();
+        Map<String, ?> schema = record.getSchema();
         assertEquals(12, schema.size());
         assertTrue(schema.containsKey("string"));
         assertEquals(String.class, schema.get("string"));
@@ -110,7 +108,7 @@ public class AvroRecordTest {
 
     @Test
     public void testGetSchemaWithNullInternalRecord() {
-        Map<String, Class> schema = nullRecord.getSchema();
+        Map<String, ?> schema = nullRecord.getSchema();
 
         assertNotNull(schema);
         assertEquals(0, schema.size());
@@ -164,7 +162,7 @@ public class AvroRecordTest {
         assertTrue(map.containsKey("boolean"));
         assertEquals(true, map.get("boolean"));
         assertTrue(map.containsKey("bytes"));
-        assertTrue(Arrays.equals("ABCD".getBytes(), (byte[]) map.get("bytes")));
+        assertArrayEquals("ABCD".getBytes(), (byte[]) map.get("bytes"));
         assertTrue(map.containsKey("double"));
         assertEquals(1.0D, map.get("double"));
         assertTrue(map.containsKey("float"));
@@ -172,7 +170,7 @@ public class AvroRecordTest {
         assertTrue(map.containsKey("long"));
         assertEquals((long) Math.pow(2.0D, 60.0D), map.get("long"));
         assertTrue(map.containsKey("null"));
-        assertEquals(null, map.get("null"));
+        assertNull(map.get("null"));
         assertTrue(map.containsKey("list"));
         assertEquals(ImmutableList.of(1, 2, 3), map.get("list"));
         assertTrue(map.containsKey("map"));
@@ -180,7 +178,7 @@ public class AvroRecordTest {
         assertTrue(map.containsKey("union1"));
         assertEquals("I'm a string!", map.get("union1"));
         assertTrue(map.containsKey("union2"));
-        assertEquals(null, map.get("union2"));
+        assertNull(map.get("union2"));
     }
 
     @Test

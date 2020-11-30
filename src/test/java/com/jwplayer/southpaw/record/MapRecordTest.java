@@ -38,7 +38,7 @@ public class MapRecordTest {
 
     @Test
     public void testGetSchemaWithNullInternalRecord() {
-        Map<String, Class> schema = record.getSchema();
+        Map<String, ?> schema = record.getSchema();
 
         assertNotNull(schema);
         assertEquals(0, schema.size());

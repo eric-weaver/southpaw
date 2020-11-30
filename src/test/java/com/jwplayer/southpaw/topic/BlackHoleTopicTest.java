@@ -20,8 +20,6 @@ import org.apache.commons.lang.NotImplementedException;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 public class BlackHoleTopicTest {
     public BlackHoleTopic<Object, Object> topic;
 

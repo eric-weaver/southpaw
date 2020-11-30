@@ -46,16 +46,14 @@ public class SouthpawEndToEndTest {
     private static final String RELATIONS_PATH3 = "test-resources/relations3.sample.json";
     private static final String TOPIC_DATA_PATH = "test-resources/topic/";
 
-    private String testName;
-    private DenormalizedRecord actualRecord;
-    private DenormalizedRecord expectedRecord;
+    private final DenormalizedRecord actualRecord;
+    private final DenormalizedRecord expectedRecord;
 
     public SouthpawEndToEndTest(
             String testName,
             DenormalizedRecord actualRecord,
             DenormalizedRecord expectedRecord
     ) {
-        this.testName = testName;
         this.actualRecord = actualRecord;
         this.expectedRecord = expectedRecord;
     }
@@ -146,13 +144,13 @@ public class SouthpawEndToEndTest {
     public static void setup() throws URISyntaxException {
         // This setup function is called manually within the parameterized test cases
         File folder = new File(new URI(ROCKSDB_BASE_URI));
-        folder.mkdirs();
+        assertTrue(folder.mkdirs());
     }
 
     @After
     public void cleanup() throws URISyntaxException {
         File folder = new File(new URI(ROCKSDB_BASE_URI));
-        folder.delete();
+        assertTrue(folder.delete());
     }
 
     @Test

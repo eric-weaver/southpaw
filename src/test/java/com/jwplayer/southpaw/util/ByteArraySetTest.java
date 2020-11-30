@@ -43,7 +43,7 @@ public class ByteArraySetTest {
      * chunk can contain. One is added to the divisor as Byte Arrays are preceded
      * by their size in chunks.
      */
-    private static final int PER_CHUNK_MAX_BYTE_ARRAY_COUNT = (int) Math.floor(Chunk.MAX_CHUNK_SIZE / (1 + RANDOM_STRING_SIZE));
+    private static final int PER_CHUNK_MAX_BYTE_ARRAY_COUNT = Math.floorDiv(Chunk.MAX_CHUNK_SIZE, (1 + RANDOM_STRING_SIZE));
 
     private static final int SIZE_EMPTY = 0;
     private static final int SIZE_REALLY_SMALL = 1;
@@ -51,7 +51,7 @@ public class ByteArraySetTest {
     /*
      * Regular size corresponds to data fitting in one single chunk.
      */
-    private static final int SIZE_REGULAR = Math.min((int) Math.floor(ByteArraySet.MAX_FRONTING_SET_SIZE / 7), PER_CHUNK_MAX_BYTE_ARRAY_COUNT);
+    private static final int SIZE_REGULAR = Math.min( Math.floorDiv(ByteArraySet.MAX_FRONTING_SET_SIZE , 7), PER_CHUNK_MAX_BYTE_ARRAY_COUNT);
     /*
      * Big and really big sizes correspond to data not fitting in one single chunk.
      */
@@ -652,6 +652,7 @@ public class ByteArraySetTest {
          * strictly greater than zero to ensure ByteArraySet.merge is
          * called on serialization.
          */
+        //noinspection ConstantConditions
         assertTrue(frontingSetByteArrayCount > 0);
 
         final int size = chunkByteArrayCount + frontingSetByteArrayCount;
@@ -702,6 +703,7 @@ public class ByteArraySetTest {
         ByteArraySet set = createBigSet();
         set.clear();
 
+        //noinspection ConstantConditions
         assertEquals(0, set.size());
     }
 
@@ -722,6 +724,7 @@ public class ByteArraySetTest {
         ByteArraySet set = createBigSet();
         assertFalse(set.isEmpty());
         set.clear();
+        //noinspection ConstantConditions
         assertTrue(set.isEmpty());
     }
 
@@ -772,8 +775,8 @@ public class ByteArraySetTest {
         byte[] bytes = set.serialize();
         ByteArraySet deSet = ByteArraySet.deserialize(bytes);
 
-        for(Integer i = 1; i <= 3000; i++) {
-            assertTrue(i.toString(), deSet.contains(new ByteArray(i)));
+        for(int i = 1; i <= 3000; i++) {
+            assertTrue(String.valueOf(i), deSet.contains(new ByteArray(i)));
         }
     }
 
@@ -783,10 +786,8 @@ public class ByteArraySetTest {
         byte[] bytes = set.serialize();
         ByteArraySet deSet = ByteArraySet.deserialize(bytes);
 
-        set.size();
-        deSet.size();
-        for(Integer i = 1; i <= 10; i++) {
-            assertTrue(i.toString(), deSet.contains(new ByteArray(i)));
+        for(int i = 1; i <= 10; i++) {
+            assertTrue(String.valueOf(i), deSet.contains(new ByteArray(i)));
         }
     }
 
@@ -810,8 +811,8 @@ public class ByteArraySetTest {
 
     @Test(expected = NotImplementedException.class)
     public void retainAll() {
-        ByteArraySet set = new ByteArraySet();
-        set.retainAll(null);
+        //noinspection RedundantOperationOnEmptyContainer
+        assertThrows(NotImplementedException.class, () -> new ByteArraySet().retainAll(null));
     }
 
     @Test

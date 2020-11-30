@@ -17,10 +17,7 @@ package com.jwplayer.southpaw.state;
 
 import com.jwplayer.southpaw.util.ByteArray;
 import org.junit.*;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
-import org.rocksdb.BackupEngine;
-import org.rocksdb.RocksDB;
 import org.rocksdb.RocksDBException;
 
 import java.io.IOException;
@@ -60,8 +57,6 @@ public class RocksDBStateTest {
 
     @Rule
     public TemporaryFolder backupFolder = new TemporaryFolder();
-
-    @Rule public ExpectedException thrown = ExpectedException.none();
 
     @Before
     public void setUp() {
@@ -105,14 +100,14 @@ public class RocksDBStateTest {
         state.open();
 
         BaseState.Iterator iter = state.iterate(KEY_SPACE);
-        Integer count = 0;
+        int count = 0;
         while (iter.hasNext()) {
             AbstractMap.SimpleEntry<byte[], byte[]> pair = iter.next();
             assertEquals(new ByteArray(count), new ByteArray(pair.getKey()));
-            assertEquals(count.toString(), new String(pair.getValue()));
+            assertEquals(String.valueOf(count), new String(pair.getValue()));
             count++;
         }
-        assertEquals(100, (int) count);
+        assertEquals(100, count);
         state.deleteBackups();
     }
 
@@ -143,22 +138,19 @@ public class RocksDBStateTest {
         state.open();
 
         BaseState.Iterator iter = state.iterate(KEY_SPACE);
-        Integer count = 0;
+        int count = 0;
         while (iter.hasNext()) {
             AbstractMap.SimpleEntry<byte[], byte[]> pair = iter.next();
             assertEquals(new ByteArray(count), new ByteArray(pair.getKey()));
-            assertEquals(count.toString(), new String(pair.getValue()));
+            assertEquals(String.valueOf(count), new String(pair.getValue()));
             count++;
         }
-        assertEquals(100, (int) count);
+        assertEquals(100, count);
         state.deleteBackups();
     }
 
     @Test
     public void backupAndRestoreCorrupt() throws URISyntaxException, IOException {
-        // Expected exception on corrupted backup
-        thrown.expect( RuntimeException.class );
-        thrown.expectMessage("org.rocksdb.RocksDBException: Checksum check failed");
         state.configure(createConfig(dbUri, backupUri));
         state.open();
         state.createKeySpace(KEY_SPACE);
@@ -170,7 +162,10 @@ public class RocksDBStateTest {
 
         corruptLatestSST();
 
-        state.restore();
+        Exception exception = assertThrows(RuntimeException.class, state::restore);
+
+        String expected = "org.rocksdb.RocksDBException: Checksum check failed";
+        assertEquals(expected, exception.getMessage());
     }
 
     @Test
@@ -201,14 +196,14 @@ public class RocksDBStateTest {
 
         //Check that the second backup restores with the expected data
         BaseState.Iterator iter = state.iterate(KEY_SPACE);
-        Integer count = 0;
+        int count = 0;
         while (iter.hasNext()) {
             AbstractMap.SimpleEntry<byte[], byte[]> pair = iter.next();
             assertEquals(new ByteArray(count), new ByteArray(pair.getKey()));
-            assertEquals(count.toString(), new String(pair.getValue()));
+            assertEquals(String.valueOf(count), new String(pair.getValue()));
             count++;
         }
-        assertEquals(200, (int) count);
+        assertEquals(200, count);
 
         //Write more data and backup
         writeData(200,250);
@@ -225,22 +220,18 @@ public class RocksDBStateTest {
         while (iter.hasNext()) {
             AbstractMap.SimpleEntry<byte[], byte[]> pair = iter.next();
             assertEquals(new ByteArray(count), new ByteArray(pair.getKey()));
-            assertEquals(count.toString(), new String(pair.getValue()));
+            assertEquals(String.valueOf(count), new String(pair.getValue()));
             count++;
         }
 
         //Check that all expected data exists
-        assertEquals(250, (int) count);
+        assertEquals(250, count);
 
         state.deleteBackups();
     }
 
     @Test
     public void backupAndRestoreAllCorruptedAutoRollback() throws URISyntaxException, IOException {
-        // Expected exception on corrupted backup
-        thrown.expect( RuntimeException.class );
-        thrown.expectMessage("org.rocksdb.RocksDBException: Checksum check failed");
-
         Map<String, Object> config = createConfig(dbUri, backupUri);
         config.put(RocksDBState.BACKUPS_AUTO_ROLLBACK_CONFIG, true);
         state.configure(config);
@@ -258,7 +249,10 @@ public class RocksDBStateTest {
 
         state.restore();
 
-        state.open();
+        Exception exception = assertThrows(RuntimeException.class, state::open);
+
+        String expected = "org.rocksdb.RocksDBException: Checksum check failed";
+        assertEquals(expected, exception.getMessage());
     }
 
     @Test
@@ -297,12 +291,13 @@ public class RocksDBStateTest {
 
     @Test
     public void deleteWithDBOpen() {
-        thrown.expect( RuntimeException.class );
-        thrown.expectMessage("RocksDB is currently open. Must call close() first.");
-
         state.configure(createConfig(dbUri, backupUri));
         state.open();
-        state.delete();
+
+        Exception exception = assertThrows(RuntimeException.class, state::delete);
+
+        String expected = "RocksDB is currently open. Must call close() first.";
+        assertEquals(expected, exception.getMessage());
     }
 
     @Test
@@ -365,14 +360,14 @@ public class RocksDBStateTest {
         writeData(0,100);
 
         BaseState.Iterator iter = state.iterate(KEY_SPACE);
-        Integer count = 0;
+        int count = 0;
         while(iter.hasNext()) {
             AbstractMap.SimpleEntry<byte[], byte[]> pair = iter.next();
             assertEquals(new ByteArray(count), new ByteArray(pair.getKey()));
-            assertEquals(count.toString(), new String(pair.getValue()));
+            assertEquals(String.valueOf(count), new String(pair.getValue()));
             count++;
         }
-        assertEquals(100, (int) count);
+        assertEquals(100, count);
     }
 
     @Test
@@ -416,15 +411,15 @@ public class RocksDBStateTest {
         state.open();
 
         BaseState.Iterator iter = state.iterate(KEY_SPACE);
-        Integer count = 0;
+        int count = 0;
         while (iter.hasNext()) {
             AbstractMap.SimpleEntry<byte[], byte[]> pair = iter.next();
             assertEquals(new ByteArray(count), new ByteArray(pair.getKey()));
-            assertEquals(count.toString(), new String(pair.getValue()));
+            assertEquals(String.valueOf(count), new String(pair.getValue()));
             count++;
         }
         // Backup data was loaded excluding data written after backup
-        assertEquals(100, (int) count);
+        assertEquals(100, count);
     }
 
     @Test
@@ -475,15 +470,15 @@ public class RocksDBStateTest {
         state.open();
 
         BaseState.Iterator iter = state.iterate(KEY_SPACE);
-        Integer count = 0;
+        int count = 0;
         while (iter.hasNext()) {
             AbstractMap.SimpleEntry<byte[], byte[]> pair = iter.next();
             assertEquals(new ByteArray(count), new ByteArray(pair.getKey()));
-            assertEquals(count.toString(), new String(pair.getValue()));
+            assertEquals(String.valueOf(count), new String(pair.getValue()));
             count++;
         }
         // Backup data was loaded excluding data written after backup
-        assertEquals(100, (int) count);
+        assertEquals(100, count);
     }
 
     @Test
@@ -530,15 +525,15 @@ public class RocksDBStateTest {
         state.createKeySpace(KEY_SPACE);
 
         BaseState.Iterator iter = state.iterate(KEY_SPACE);
-        Integer count = 0;
+        int count = 0;
         while (iter.hasNext()) {
             AbstractMap.SimpleEntry<byte[], byte[]> pair = iter.next();
             assertEquals(new ByteArray(count), new ByteArray(pair.getKey()));
-            assertEquals(count.toString(), new String(pair.getValue()));
+            assertEquals(String.valueOf(count), new String(pair.getValue()));
             count++;
         }
         // Local database was used which has more recent data than the backup
-        assertEquals(0, (int) count);
+        assertEquals(0, count);
     }
 
     @Test
@@ -589,15 +584,15 @@ public class RocksDBStateTest {
         state.open();
 
         BaseState.Iterator iter = state.iterate(KEY_SPACE);
-        Integer count = 0;
+        int count = 0;
         while (iter.hasNext()) {
             AbstractMap.SimpleEntry<byte[], byte[]> pair = iter.next();
             assertEquals(new ByteArray(count), new ByteArray(pair.getKey()));
-            assertEquals(count.toString(), new String(pair.getValue()));
+            assertEquals(String.valueOf(count), new String(pair.getValue()));
             count++;
         }
         // Local database was used which has more recent data than the backup
-        assertEquals(200, (int) count);
+        assertEquals(200, count);
     }
 
     @Test
@@ -642,15 +637,15 @@ public class RocksDBStateTest {
         state.open();
 
         BaseState.Iterator iter = state.iterate(KEY_SPACE);
-        Integer count = 0;
+        int count = 0;
         while (iter.hasNext()) {
             AbstractMap.SimpleEntry<byte[], byte[]> pair = iter.next();
             assertEquals(new ByteArray(count), new ByteArray(pair.getKey()));
-            assertEquals(count.toString(), new String(pair.getValue()));
+            assertEquals(String.valueOf(count), new String(pair.getValue()));
             count++;
         }
         // Backup data was loaded excluding data written after backup
-        assertEquals(100, (int) count);
+        assertEquals(100, count);
     }
 
     @Test
@@ -701,15 +696,15 @@ public class RocksDBStateTest {
         state.open();
 
         BaseState.Iterator iter = state.iterate(KEY_SPACE);
-        Integer count = 0;
+        int count = 0;
         while (iter.hasNext()) {
             AbstractMap.SimpleEntry<byte[], byte[]> pair = iter.next();
             assertEquals(new ByteArray(count), new ByteArray(pair.getKey()));
-            assertEquals(count.toString(), new String(pair.getValue()));
+            assertEquals(String.valueOf(count), new String(pair.getValue()));
             count++;
         }
         // Local database was used which has more recent data than the backup
-        assertEquals(200, (int) count);
+        assertEquals(200, count);
     }
 
     @Test
@@ -752,16 +747,20 @@ public class RocksDBStateTest {
 
     private void corruptLatestSST() throws URISyntaxException, IOException {
         Path dir = Paths.get(new URI(backupFolder.getRoot().toURI().toString() + "/shared"));
-        Optional<Path> lastFilePath = Files.list(dir)
+        Files.list(dir)
                 .filter(f -> !Files.isDirectory(f))
-                .max(Comparator.naturalOrder());
-
-        Files.write(lastFilePath.get(), "garbage".getBytes(), StandardOpenOption.APPEND);
+                .max(Comparator.naturalOrder()).ifPresent((Path lastFilePath)-> {
+                    try{
+                        Files.write(lastFilePath, "garbage".getBytes(), StandardOpenOption.APPEND);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
     }
 
     private void writeData(int start, int end) {
-        for(Integer i = start; i < end; i++) {
-            state.put(KEY_SPACE, new ByteArray(i).getBytes(), i.toString().getBytes());
+        for(int i = start; i < end; i++) {
+            state.put(KEY_SPACE, new ByteArray(i).getBytes(), String.valueOf(i).getBytes());
         }
         state.flush();
     }

@@ -30,7 +30,7 @@ public class ByteArrayTest {
         byte[] bytes = { 1 };
         ByteArray byteArray = ByteArray.toByteArray(true);
 
-        assertTrue(Arrays.equals(bytes, byteArray.getBytes()));
+        assertArrayEquals(bytes, byteArray.getBytes());
     }
 
     @Test
@@ -38,7 +38,7 @@ public class ByteArrayTest {
         byte[] bytes = { 9, 9, 9 };
         ByteArray byteArray = ByteArray.toByteArray(bytes);
 
-        assertTrue(Arrays.equals(bytes, byteArray.getBytes()));
+        assertArrayEquals(bytes, byteArray.getBytes());
     }
 
     @Test
@@ -46,7 +46,7 @@ public class ByteArrayTest {
         ByteArray byteArray = new ByteArray("Test");
         byteArray.concat(new ByteArray(1));
 
-        assertTrue(Arrays.equals(ArrayUtils.add("Test".getBytes(), (byte) 1), byteArray.getBytes()));
+        assertArrayEquals(ArrayUtils.add("Test".getBytes(), (byte) 1), byteArray.getBytes());
     }
 
     @Test
@@ -55,8 +55,8 @@ public class ByteArrayTest {
         ByteArray right = new ByteArray(1234L);
         ByteArray right2 = new ByteArray("Banana");
 
-        assertTrue(left.equals(right));
-        assertFalse(left.equals(right2));
+        assertEquals(left, right);
+        assertNotEquals(left, right2);
     }
 
     @Test
@@ -80,14 +80,14 @@ public class ByteArrayTest {
     public void testInteger() throws Exception {
         ByteArray byteArray = ByteArray.toByteArray(1234);
 
-        assertTrue(Arrays.equals(Hex.decodeHex("04d2".toCharArray()), byteArray.getBytes()));
+        assertArrayEquals(Hex.decodeHex("04d2".toCharArray()), byteArray.getBytes());
     }
 
     @Test
     public void testLong() throws Exception {
         ByteArray byteArray = ByteArray.toByteArray(1234L);
 
-        assertTrue(Arrays.equals(Hex.decodeHex("04d2".toCharArray()), byteArray.getBytes()));
+        assertArrayEquals(Hex.decodeHex("04d2".toCharArray()), byteArray.getBytes());
     }
 
     @Test
@@ -99,7 +99,7 @@ public class ByteArrayTest {
     public void testString() {
         ByteArray byteArray = ByteArray.toByteArray("Test");
 
-        assertTrue(Arrays.equals("Test".getBytes(), byteArray.getBytes()));
+        assertArrayEquals("Test".getBytes(), byteArray.getBytes());
     }
 
     @Test
@@ -109,7 +109,7 @@ public class ByteArrayTest {
         list.add(new ByteArray("A"));
         list.add(new ByteArray(1234));
         list.add(new ByteArray(false));
-        assertTrue(Arrays.equals(bytes, ByteArray.toBytes(list)));
+        assertArrayEquals(bytes, ByteArray.toBytes(list));
     }
 
     @Test

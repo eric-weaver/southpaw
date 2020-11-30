@@ -37,10 +37,10 @@ import static org.junit.Assert.*;
 
 
 public class S3HelperTest {
-    protected String bucket = "bucket.com";
-    protected URI s3Uri;
-    protected S3Mock s3Mock;
-    protected S3Helper s3;
+    private final String bucket = "bucket.com";
+    private URI s3Uri;
+    private S3Mock s3Mock;
+    private S3Helper s3;
 
     @Rule
     public TemporaryFolder tmpDir = new TemporaryFolder();
@@ -135,7 +135,7 @@ public class S3HelperTest {
         s3.syncToS3(tmpDir.getRoot().toURI(), backupUri);
         s3.waitForSyncToS3();
 
-        feedFile.delete();
+        assertTrue(feedFile.delete());
 
         File playerFile = tmpDir.newFile("player.txt");
         Files.write(playerFile.toPath(), "player".getBytes());

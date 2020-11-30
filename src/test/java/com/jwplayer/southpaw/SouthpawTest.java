@@ -70,7 +70,7 @@ public class SouthpawTest {
 
     @Test
     public void testCreateInternalRecord() {
-        Map<String, Comparable> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
         map.put("A", 1);
         map.put("B", false);
         map.put("C", "Badger");
@@ -78,7 +78,7 @@ public class SouthpawTest {
         Record internalRecord = southpaw.createInternalRecord(mapRecord);
         Map<String, Object> internalMap = internalRecord.getAdditionalProperties();
 
-        for(Map.Entry<String, Comparable> entry: map.entrySet()) {
+        for(Map.Entry<String, Object> entry: map.entrySet()) {
             assertTrue(internalMap.containsKey(entry.getKey()));
             assertEquals(entry.getValue(), internalMap.get(entry.getKey()));
         }

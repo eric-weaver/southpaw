@@ -28,10 +28,10 @@ import java.util.*;
 public class KafkaTestServer {
     public static final String HOST = "localhost";
 
-    private KafkaServerStartable kafkaServer;
-    private Integer port;
-    private ZookeeperTestServer zkServer;
-    private ZkUtils zkUtils;
+    private final KafkaServerStartable kafkaServer;
+    private final Integer port;
+    private final ZookeeperTestServer zkServer;
+    private final ZkUtils zkUtils;
 
     public KafkaTestServer() {
         zkServer = new ZookeeperTestServer();

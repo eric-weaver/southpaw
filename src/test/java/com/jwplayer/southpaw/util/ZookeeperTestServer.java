@@ -25,7 +25,7 @@ import java.io.IOException;
 
 
 public class ZookeeperTestServer {
-    private TestingServer testingServer;
+    private final TestingServer testingServer;
 
     public ZookeeperTestServer() {
         try {
